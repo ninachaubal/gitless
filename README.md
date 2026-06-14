@@ -51,6 +51,34 @@ and in sync with your GitHub backup, feature work happens in `.worktrees/<featur
 and is folded in when you're done, and ignore rules update themselves as you add
 languages and frameworks.
 
+## Installing
+
+This repo is its own plugin marketplace. Add it and install:
+
+```
+/plugin marketplace add ninachaubal/gitless
+/plugin install gitless@ninachaubal
+```
+
+Then make a project gitless-managed with `/gitless:new-project <name>` or
+`/gitless:adopt`.
+
+## Trying it locally (no install)
+
+From a clone of this repo, load it into a session without installing anything
+(session-only — nothing persists when you close it):
+
+```
+git clone https://github.com/ninachaubal/gitless
+claude --plugin-dir ./gitless
+```
+
+The scripts can also be run directly for testing:
+
+```
+bash gitless/scripts/bootstrap.sh
+```
+
 ## Layout
 
 ```
@@ -60,34 +88,6 @@ commands/*.md                 slash-command entry points (also reached by plain 
 scripts/*.sh                  the friendly git wrappers
 scripts/lib/common.sh         shared helpers + plain-language output
 hooks/                        auto-updates ignore rules when a stack is detected
-```
-
-## Installing
-
-This repo is its own plugin marketplace. Add it and install:
-
-```
-/plugin marketplace add ~/workspace/plugins/gitless   # or a published git URL
-/plugin install gitless@ninachaubal
-```
-
-Then make a project gitless-managed with `/gitless:new-project <name>` or
-`/gitless:adopt`.
-
-## Trying it locally (no install)
-
-Load it into a session without installing anything (session-only — nothing
-persists when you close it):
-
-```
-claude --plugin-dir ~/workspace/plugins/gitless
-```
-
-The scripts can also be run directly for testing:
-
-```
-bash scripts/bootstrap.sh
-cd /tmp && bash ~/workspace/plugins/gitless/scripts/new-project.sh demo-app
 ```
 
 ## Not in scope (yet)
