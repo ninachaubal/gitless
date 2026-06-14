@@ -1,0 +1,8 @@
+{
+  "name": "gitless",
+  "version": "0.1.0",
+  "description": "Plain-language version control for people who don't know (or don't want to deal with) git. Create projects, save your work, build features, and undo — without ever seeing git jargon.",
+  "author": {
+    "name": "nina"
+  }
+}

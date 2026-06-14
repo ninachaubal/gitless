@@ -1,0 +1,14 @@
+{
+  "name": "ninachaubal",
+  "owner": {
+    "name": "nina"
+  },
+  "description": "Nina's Claude Code plugins, starting with gitless — version control without the git jargon.",
+  "plugins": [
+    {
+      "name": "gitless",
+      "source": "./",
+      "description": "Plain-language version control for people who don't know (or don't want to deal with) git — projects, checkpoints, features, and undo, without any git jargon."
+    }
+  ]
+}
