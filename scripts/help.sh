@@ -10,12 +10,12 @@ You don't need to know git. Just tell me what you want in your own words
 
   Start a new project      "start a project called recipes"      /gitless:new-project
   Use gitless here          "manage this folder with gitless"     /gitless:adopt
-  Build something new       "let's add a dark mode"               /gitless:feature
+  Build something new       "new feature: search"                 /gitless:feature
   Save your progress        "save"  /  "save a checkpoint"        /gitless:save
   Go back                   "undo"  /  "go back"                  /gitless:undo
   Go forward again          "redo"                                /gitless:redo
   Finish what you built     "it's done"  /  "ship it"             /gitless:done
-  Remove a feature          "get rid of the dark mode feature"    /gitless:remove-feature
+  Remove a feature          "get rid of the search feature"       /gitless:remove-feature
   See where things stand    "where are we?"  /  "is it saved?"    /gitless:status
   Set up cloud backups      "set up backups"                      /gitless:setup
 
