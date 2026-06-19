@@ -14,7 +14,8 @@ file="$root/CLAUDE.md"
 BEGIN="<!-- gitless:begin (managed by the gitless plugin — keep your own notes outside this block) -->"
 END="<!-- gitless:end -->"
 
-block="$(cat <<'EOF'
+gitless_block() {
+cat <<'EOF'
 ## This project uses gitless
 
 This project is managed with **gitless** — version control in plain, everyday
@@ -47,7 +48,7 @@ What to do for common requests:
 
 Invoke the **gitless** skill for the full guidance and exact wording.
 EOF
-)"
+}
 
 touch "$file"
 tmp="$(mktemp)"
@@ -58,5 +59,5 @@ else
   cat "$file" > "$tmp"
   [ -s "$tmp" ] && printf '\n' >> "$tmp"
 fi
-{ printf '%s\n' "$BEGIN"; printf '%s\n' "$block"; printf '%s\n' "$END"; } >> "$tmp"
+{ printf '%s\n' "$BEGIN"; gitless_block; printf '%s\n' "$END"; } >> "$tmp"
 mv "$tmp" "$file"
