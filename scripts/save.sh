@@ -18,6 +18,15 @@ note="$*"
 # progress, else the real project.
 target="$(work_target)"
 
+# Projects set up before gitless supported Codex have their notes only in
+# CLAUDE.md. Quietly bring them up to date (on the real project, so a feature
+# in progress never diverges from it); this save picks the change up.
+root="$(project_root)"
+if [ "$target" = "$root" ] && ! grep -qs 'gitless:begin' "$root/AGENTS.md" \
+   && is_gitless_project "$root"; then
+  bash "$HERE/write-project-notes.sh" "$root" >/dev/null 2>&1 || true
+fi
+
 if [ -z "$(git -C "$target" status --porcelain 2>/dev/null)" ]; then
   [ "$quiet" -eq 1 ] || ok "Nothing new to save — you're all caught up."
   exit 0

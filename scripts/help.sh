@@ -2,22 +2,27 @@
 # Show the user, in plain language, what they can do and the usual flow — so they
 # can get un-stuck in the session instead of digging up the README.
 
-cat <<'EOF'
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/common.sh
+source "$HERE/lib/common.sh"
+p="$(gl_cmd '')"   # /gitless: in Claude Code, $gitless: in Codex
+
+cat <<EOF
 gitless — your work, kept safe, in plain language.
 
 You don't need to know git. Just tell me what you want in your own words
-(or type the /gitless: command). The main things you can do:
+(or type the ${p} command). The main things you can do:
 
-  Start a new project      "start a project called recipes"      /gitless:new-project
-  Use gitless here          "manage this folder with gitless"     /gitless:adopt
-  Build something new       "new feature: search"                 /gitless:feature
-  Save your progress        "save"  /  "save a checkpoint"        /gitless:save
-  Go back                   "undo"  /  "go back"                  /gitless:undo
-  Go forward again          "redo"                                /gitless:redo
-  Finish what you built     "it's done"  /  "ship it"             /gitless:done
-  Remove a feature          "get rid of the search feature"       /gitless:remove-feature
-  See where things stand    "where are we?"  /  "is it saved?"    /gitless:status
-  Set up cloud backups      "set up backups"                      /gitless:setup
+  Start a new project      "start a project called recipes"      ${p}new-project
+  Use gitless here          "manage this folder with gitless"     ${p}adopt
+  Build something new       "new feature: search"                 ${p}feature
+  Save your progress        "save"  /  "save a checkpoint"        ${p}save
+  Go back                   "undo"  /  "go back"                  ${p}undo
+  Go forward again          "redo"                                ${p}redo
+  Finish what you built     "it's done"  /  "ship it"             ${p}done
+  Remove a feature          "get rid of the search feature"       ${p}remove-feature
+  See where things stand    "where are we?"  /  "is it saved?"    ${p}status
+  Set up cloud backups      "set up backups"                      ${p}setup
 
 The usual flow:
 

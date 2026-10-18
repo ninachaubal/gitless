@@ -5,13 +5,15 @@ with — git. It gives someone building a personal project the safety net of ver
 control (saved checkpoints, cloud backup, safe spaces to experiment, real undo)
 without ever showing them git jargon.
 
-It's a Claude Code plugin: a **skill** that teaches Claude to speak plainly and a
-set of **scripts** that bundle each git flow into one friendly command.
+It's a plugin for both **Claude Code** and **Codex**: a **skill** that teaches the
+agent to speak plainly and a set of **scripts** that bundle each git flow into one
+friendly command. One repo serves both.
 
 ## What you can do
 
-You never have to learn git. You just talk to Claude — in plain language or with a
-slash command; both do the same thing.
+You never have to learn git. You just talk to Claude or Codex — in plain language
+or with a command; both do the same thing. In Codex, type `$gitless:` instead of
+`/gitless:` (e.g. `$gitless:save`).
 
 | What you want | Just say… | …or run |
 | --- | --- | --- |
@@ -27,8 +29,8 @@ slash command; both do the same thing.
 | See where things stand | "where are we?" / "is it backed up?" | `/gitless:status` |
 | Get a reminder of how this works | "how do I use this?" / "remind me" | `/gitless:help` |
 
-Claude also saves quietly on its own at natural stopping points, so you rarely
-have to remember to.
+Your agent also saves quietly on its own at natural stopping points, so you
+rarely have to remember to.
 
 ## The workflow
 
@@ -53,15 +55,32 @@ languages and frameworks.
 
 ## Installing
 
-This repo is its own plugin marketplace. Add it and install:
+This repo is its own plugin marketplace for both tools.
+
+**Claude Code:**
 
 ```
 /plugin marketplace add ninachaubal/gitless
 /plugin install gitless@ninachaubal
 ```
 
+**Codex:**
+
+```
+codex plugin marketplace add ninachaubal/gitless
+codex plugin add gitless@ninachaubal
+```
+
+Two one-time approvals in Codex:
+
+- Run `/hooks` and trust gitless's hook. That's the one that keeps ignore rules
+  up to date. Codex doesn't run a plugin's hooks until you trust them.
+- Codex runs commands in a sandbox that blocks saving and backing up. The first
+  time gitless saves, Codex asks to run its script outside the sandbox. Choose
+  the option to always allow it so you aren't asked again.
+
 Then make a project gitless-managed with `/gitless:new-project <name>` or
-`/gitless:adopt`.
+`/gitless:adopt` (`$gitless:new-project`, `$gitless:adopt` in Codex).
 
 ## Trying it locally (no install)
 
@@ -73,6 +92,14 @@ git clone https://github.com/ninachaubal/gitless
 claude --plugin-dir ./gitless
 ```
 
+Codex has no session-only mode, but it can install straight from the clone (and
+`codex plugin marketplace remove ninachaubal` undoes it):
+
+```
+codex plugin marketplace add ./gitless
+codex plugin add gitless@ninachaubal
+```
+
 The scripts can also be run directly for testing:
 
 ```
@@ -82,13 +109,20 @@ bash gitless/scripts/bootstrap.sh
 ## Layout
 
 ```
-.claude-plugin/plugin.json   manifest
+.claude-plugin/plugin.json    manifest (Codex reads it too)
+.claude-plugin/marketplace.json  marketplace listing (Codex reads it too)
 skills/gitless/SKILL.md       the behavior + vocabulary (the brain)
-commands/*.md                 slash-command entry points (also reached by plain language)
+skills/<command>/SKILL.md     the /gitless:<command> ($gitless:<command>) entry points
+skills/<command>/agents/openai.yaml  tells Codex to run these only when asked by name
 scripts/*.sh                  the friendly git wrappers
 scripts/lib/common.sh         shared helpers + plain-language output
 hooks/                        auto-updates ignore rules when a stack is detected
 ```
+
+Each gitless project gets a "uses gitless" note in its `AGENTS.md`, which both
+Codex and Claude Code read. If the project also has a `CLAUDE.md`, gitless adds an
+`@AGENTS.md` import to it, because Claude Code reads only `CLAUDE.md` when one
+exists.
 
 ## Not in scope (yet)
 

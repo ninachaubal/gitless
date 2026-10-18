@@ -7,7 +7,7 @@ source "$HERE/lib/common.sh"
 
 enter_project
 if ! git rev-parse --git-dir >/dev/null 2>&1; then
-  info "This folder isn't a project yet. Run /new-project to start one."
+  info "This folder isn't a project yet. Run $(gl_cmd new-project) to start one."
   exit 0
 fi
 
@@ -48,7 +48,7 @@ if has_remote; then
     info "Not backed up to GitHub yet — I'll do that on your next save."
   fi
 else
-  info "Not connected to GitHub yet. Run /setup to turn on cloud backup."
+  info "Not connected to GitHub yet. Run $(gl_cmd setup) to turn on cloud backup."
 fi
 
 # When did we last save?
