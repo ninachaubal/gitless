@@ -10,25 +10,37 @@ payload="$(cat 2>/dev/null || true)"
 # Fast bail: the payload doesn't mention any manifest we care about.
 printf '%s' "$payload" | grep -qE 'package\.json|package-lock|pnpm-lock|yarn\.lock|tsconfig\.json|requirements\.txt|pyproject\.toml|Pipfile|setup\.py|setup\.cfg|Cargo\.toml|go\.mod|pom\.xml|build\.gradle' || exit 0
 
-# The path of the file that was written/edited.
-file=""
+# The path(s) of the file(s) that were written/edited. Claude Code reports
+# `tool_input.file_path`. Codex edits through apply_patch: its patch text (in
+# `tool_input.command`) names each file on an "*** Add File: <path>" or
+# "*** Update File: <path>" line, relative to the session's `cwd`.
+files="" patch="" cwd=""
 if command -v jq >/dev/null 2>&1; then
-  file="$(printf '%s' "$payload" | jq -r '.tool_input.file_path // empty' 2>/dev/null || true)"
+  files="$(printf '%s' "$payload" | jq -r '.tool_input.file_path // empty' 2>/dev/null || true)"
+  patch="$(printf '%s' "$payload" | jq -r '.tool_input.command // empty | if type == "array" then .[] else . end | strings' 2>/dev/null || true)"
+  cwd="$(printf '%s' "$payload" | jq -r '.cwd // empty' 2>/dev/null || true)"
+else
+  files="$(printf '%s' "$payload" | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed -E 's/.*:[[:space:]]*"//; s/"$//')"
+  patch="$(printf '%s' "$payload" | grep -oE '\*\*\* (Add|Update) File: [^"\\]+' || true)"
+  cwd="$(printf '%s' "$payload" | grep -o '"cwd"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed -E 's/.*:[[:space:]]*"//; s/"$//')"
 fi
-if [ -z "$file" ]; then
-  file="$(printf '%s' "$payload" | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed -E 's/.*:[[:space:]]*"//; s/"$//')"
-fi
-[ -n "$file" ] || exit 0
+files="$files"$'\n'"$(printf '%s\n' "$patch" | sed -n -E 's/^\*\*\* (Add|Update) File: //p')"
 
-# Which stack does that file imply?
-case "$(basename "$file")" in
-  package.json|package-lock.json|pnpm-lock.yaml|yarn.lock|tsconfig.json) stack=node ;;
-  requirements.txt|pyproject.toml|Pipfile|setup.py|setup.cfg)            stack=python ;;
-  Cargo.toml)                                                            stack=rust ;;
-  go.mod)                                                                stack=go ;;
-  pom.xml|build.gradle|build.gradle.kts)                                 stack=java ;;
-  *) exit 0 ;;
-esac
+# Which stack does that imply? The first file that names one decides.
+file="" stack=""
+while IFS= read -r f; do
+  case "$(basename "$f")" in
+    package.json|package-lock.json|pnpm-lock.yaml|yarn.lock|tsconfig.json) stack=node ;;
+    requirements.txt|pyproject.toml|Pipfile|setup.py|setup.cfg)            stack=python ;;
+    Cargo.toml)                                                            stack=rust ;;
+    go.mod)                                                                stack=go ;;
+    pom.xml|build.gradle|build.gradle.kts)                                 stack=java ;;
+    *) continue ;;
+  esac
+  file="$f"; break
+done <<<"$files"
+[ -n "$stack" ] || exit 0
+case "$file" in /*) ;; *) file="${cwd:-$PWD}/$file" ;; esac
 
 dir="$(dirname "$file")"
 [ -d "$dir" ] || exit 0
@@ -38,7 +50,7 @@ root="$(git -C "$dir" worktree list --porcelain 2>/dev/null | sed -n 's/^worktre
 # Only touch projects gitless manages (never the user's other repos).
 managed="$(git -C "$root" config --get gitless.managed 2>/dev/null || true)"
 if [ "$managed" != "true" ]; then
-  if ! { { [ -f "$root/CLAUDE.md" ] && grep -q 'gitless:begin' "$root/CLAUDE.md"; } || [ -d "$root/.worktrees" ]; }; then
+  if ! { grep -qs 'gitless:begin' "$root/AGENTS.md" "$root/CLAUDE.md" || [ -d "$root/.worktrees" ]; }; then
     exit 0
   fi
 fi

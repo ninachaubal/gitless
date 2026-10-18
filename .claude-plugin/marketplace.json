@@ -3,7 +3,7 @@
   "owner": {
     "name": "nina"
   },
-  "description": "Nina's Claude Code plugins, starting with gitless — version control without the git jargon.",
+  "description": "Nina's plugins for Claude Code and Codex, starting with gitless — version control without the git jargon.",
   "plugins": [
     {
       "name": "gitless",

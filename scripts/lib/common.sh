@@ -130,7 +130,25 @@ enter_project() {
 require_project() {
   enter_project
   if ! git rev-parse --git-dir >/dev/null 2>&1; then
-    oops "This folder isn't a project yet. Want me to start one? (run /new-project)"
+    oops "This folder isn't a project yet. Want me to start one? (run $(gl_cmd new-project))"
     exit 1
+  fi
+}
+
+# Does gitless manage this project? (So we never touch the user's other repos.)
+is_gitless_project() {  # [root]
+  local r="${1:-$(project_root)}"
+  [ "$(git -C "$r" config --get gitless.managed 2>/dev/null)" = "true" ] \
+    || grep -qs 'gitless:begin' "$r/AGENTS.md" "$r/CLAUDE.md" \
+    || [ -d "$r/.worktrees" ]
+}
+
+# How the user types a gitless command in the agent they're using:
+# /gitless:save in Claude Code, $gitless:save in Codex.
+gl_cmd() {  # <name>
+  if [ -n "${CODEX_THREAD_ID:-}" ] && [ -z "${CLAUDECODE:-}" ]; then
+    printf '$gitless:%s' "$1"
+  else
+    printf '/gitless:%s' "$1"
   fi
 }

@@ -9,7 +9,7 @@ require_project
 
 desc="$*"
 if [ -z "$desc" ]; then
-  oops "What are we building? (e.g. /feature add a dark mode)"
+  oops "What are we building? (e.g. $(gl_cmd feature) add a dark mode)"
   exit 1
 fi
 
@@ -43,6 +43,6 @@ if git -C "$root" worktree add "$path" -b "$slug" >/dev/null 2>&1; then
   say  ""
   say  "WORKSPACE: $path"
 else
-  oops "Couldn't open a separate space. Is the project set up yet? (try /status)"
+  oops "Couldn't open a separate space. Is the project set up yet? (try $(gl_cmd status))"
   exit 1
 fi

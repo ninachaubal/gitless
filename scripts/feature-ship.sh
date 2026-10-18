@@ -54,7 +54,7 @@ fi
 feats="$(feature_worktrees)"
 nfeat="$(printf '%s' "$feats" | grep -c .)"
 if [ "$nfeat" -eq 0 ]; then
-  oops "There's no feature in progress to add. (Start one with /feature.)"
+  oops "There's no feature in progress to add. (Start one with $(gl_cmd feature).)"
   exit 1
 fi
 

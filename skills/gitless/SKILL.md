@@ -1,6 +1,6 @@
 ---
 name: gitless
-description: Plain-language version control for people who don't know or want to deal with git. Use in a gitless project (its CLAUDE.md has a "uses gitless" note) and whenever the user wants to get set up, start a project, save or back up work, build/add/make/change/finish/remove a feature, undo or redo, or check where things stand — i.e. anytime you'd otherwise run git or gh, or are about to build something new. Translates all git jargon into everyday words.
+description: Plain-language version control for people who don't know or want to deal with git. Use in a gitless project (its AGENTS.md or CLAUDE.md has a "uses gitless" note) and whenever the user wants to get set up, start a project, save or back up work, build/add/make/change/finish/remove a feature, undo or redo, or check where things stand — i.e. anytime you'd otherwise run git or gh, or are about to build something new. Translates all git jargon into everyday words.
 ---
 
 # gitless — version control without the vocabulary
@@ -50,24 +50,38 @@ When someone is brand new, explain it as a backup service, not a git host:
 
 ## The tools (always use these, never raw git)
 
-All scripts live in `${CLAUDE_PLUGIN_ROOT}/scripts/` and print friendly output.
-Run them with `bash` and relay their output as-is (or summarize in plain words).
+All scripts live in this plugin's `scripts/` folder: `${CLAUDE_PLUGIN_ROOT}/scripts/`
+in Claude Code; in Codex, the `scripts/` folder two levels above this SKILL.md.
+They print friendly output. Run them with `bash` and relay their output as-is (or
+summarize in plain words).
 **They work from anywhere inside the project** — `save`, `done`, and `status`
 find the feature in progress on their own. So you never need to `cd` into a
 feature folder to run them, and you never need to read a script's source to
 figure out how to call it. Just call it.
 
-- `bootstrap.sh` — check/repair the toolchain (git, GitHub CLI, sign-in). `/setup`
-- `new-project.sh <name>` — make a project: folder, GitHub backup, sensible ignore rules. `/new-project`
-- `feature-start.sh <description>` — open a separate space to build a feature. `/feature`
-- `save.sh [note]` — save a checkpoint of the current work. `/save`
-- `undo.sh [steps|list]` — step back through recent checkpoints (recoverably). `/undo`
-- `redo.sh [steps]` — step forward again after an undo. `/redo`
-- `feature-remove.sh <name>` — remove a whole finished feature from the project (reversible). `/remove-feature`
-- `feature-ship.sh [continue]` — add the finished feature to the project + back up. `/done`
+Each one also has a command the user can type themselves — `/gitless:<name>` in
+Claude Code, `$gitless:<name>` in Codex (e.g. `/gitless:save`, `$gitless:save`):
+
+- `bootstrap.sh` — check/repair the toolchain (git, GitHub CLI, sign-in). `setup`
+- `new-project.sh <name>` — make a project: folder, GitHub backup, sensible ignore rules. `new-project`
+- `feature-start.sh <description>` — open a separate space to build a feature. `feature`
+- `save.sh [note]` — save a checkpoint of the current work. `save`
+- `undo.sh [steps|list]` — step back through recent checkpoints (recoverably). `undo`
+- `redo.sh [steps]` — step forward again after an undo. `redo`
+- `feature-remove.sh <name>` — remove a whole finished feature from the project (reversible). `remove-feature`
+- `feature-ship.sh [continue]` — add the finished feature to the project + back up. `done`
 - `update-gitignore.sh <stack>...` — quietly keep ignore rules sane for the stack in use.
-- `status.sh` — plain-language "where things stand." `/status`
-- `help.sh` — show the user what they can do + the usual flow. `/help`
+- `status.sh` — plain-language "where things stand." `status`
+- `help.sh` — show the user what they can do + the usual flow. `help`
+- `write-project-notes.sh` — add/refresh the "uses gitless" note in the project's AGENTS.md (an existing CLAUDE.md imports it).
+
+**If your commands run in a sandbox (Codex does by default),** these scripts
+need to step outside it: they write the project's saved history and reach
+GitHub, which the sandbox blocks. Ask to run them with escalated permissions from
+the start rather than letting them fail first, with a plain-language reason the
+user will understand ("Save your work and back it up to GitHub?"), and suggest a
+rule scoped to this plugin's scripts so they only have to approve it once. Never
+mention the sandbox, git, or `.git` in that reason.
 
 ## How to behave
 
@@ -83,7 +97,7 @@ automatically — so you never need to chase the right folder.
 
 **When the user seems lost, show them the ropes.** If they ask how this works,
 what they can do, or seem unsure ("how do I…", "what can I do", "remind me", "I
-forgot how this works"), run `help.sh` (or point them to /help) and answer their
+forgot how this works"), run `help.sh` (or point them to the `help` command) and answer their
 question from it in plain language.
 
 **Ignore rules update themselves.** When a project picks up a language or
@@ -93,7 +107,7 @@ anything, and don't mention it unless the user asks.
 
 **Save often (auto + manual).** Quietly run `save.sh` at natural stopping points —
 after a working change, before anything risky, before an undo. Also save whenever
-the user asks ("save that," "/save"). The user should never lose work. Keep
+the user asks ("save that," or the `save` command). The user should never lose work. Keep
 auto-save quiet; don't announce every checkpoint — mention it only when useful.
 
 **Before building anything new, open a feature first — never build on the real
@@ -104,8 +118,8 @@ header sticky") — do **not** start editing code. First treat it as a new featu
 confirm *once* ("Want me to set this up as a separate feature so your project
 stays safe while we work?"), then run `feature-start.sh` and do the work in the
 space it opens. Once you're inside a feature, just keep working there — don't ask
-again on every small change. `/feature` and `/done` are there for users who'd
-rather drive it themselves.
+again on every small change. The `feature` and `done` commands are there for
+users who'd rather drive it themselves.
 
 **When you're in a feature, put file edits in its space.** After
 `feature-start.sh` prints `WORKSPACE: <path>`, make your *file edits* under that

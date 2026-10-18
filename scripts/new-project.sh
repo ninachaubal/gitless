@@ -11,7 +11,7 @@ visibility="--private"
 [ "${2:-}" = "--public" ] && visibility="--public"
 
 if [ -z "$name" ]; then
-  oops "What should the project be called? (e.g. /new-project my-app)"
+  oops "What should the project be called? (e.g. $(gl_cmd new-project) my-app)"
   exit 1
 fi
 
@@ -57,7 +57,7 @@ if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
   fi
 else
   info "Not signed in to GitHub yet, so I made the project locally only."
-  info "Run /setup to connect it for cloud backup whenever you're ready."
+  info "Run $(gl_cmd setup) to connect it for cloud backup whenever you're ready."
 fi
 
 say ""

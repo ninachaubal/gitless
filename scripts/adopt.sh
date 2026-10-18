@@ -38,7 +38,7 @@ if ! has_remote && command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>
     ok "Backed it up to GitHub${url:+ at $url}"
   fi
 elif ! has_remote; then
-  info "Run /setup to connect GitHub for cloud backup whenever you're ready."
+  info "Run $(gl_cmd setup) to connect GitHub for cloud backup whenever you're ready."
 fi
 
 say ""
