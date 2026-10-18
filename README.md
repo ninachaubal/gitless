@@ -82,22 +82,41 @@ Two one-time approvals in Codex:
 Then make a project gitless-managed with `/gitless:new-project <name>` or
 `/gitless:adopt` (`$gitless:new-project`, `$gitless:adopt` in Codex).
 
-## Trying it locally (no install)
+## Updating
 
-From a clone of this repo, load it into a session without installing anything
-(session-only — nothing persists when you close it):
-
-```
-git clone https://github.com/ninachaubal/gitless
-claude --plugin-dir ./gitless
-```
-
-Codex has no session-only mode, but it can install straight from the clone (and
-`codex plugin marketplace remove ninachaubal` undoes it):
+Both tools keep their own copy of this repo, so pull in a new version with:
 
 ```
-codex plugin marketplace add ./gitless
+claude plugin marketplace update ninachaubal       # Claude Code
+claude plugin update gitless@ninachaubal
+```
+
+```
+codex plugin marketplace upgrade ninachaubal       # Codex
 codex plugin add gitless@ninachaubal
+```
+
+Start a new session afterward to pick up the changes.
+
+## Trying a branch before it's merged
+
+**Codex** installs any branch straight from GitHub, no clone needed. Add
+`--ref <branch>` to the usual install:
+
+```
+codex plugin marketplace add ninachaubal/gitless --ref <branch>
+codex plugin add gitless@ninachaubal
+```
+
+To go back to `main`, run `codex plugin marketplace remove ninachaubal` and
+install as usual.
+
+**Claude Code** can load a clone of the repo for one session without installing
+anything (nothing persists when you close it):
+
+```
+git clone -b <branch> https://github.com/ninachaubal/gitless
+claude --plugin-dir ./gitless
 ```
 
 The scripts can also be run directly for testing:
